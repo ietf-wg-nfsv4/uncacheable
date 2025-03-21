@@ -11,7 +11,7 @@ workgroup: Network File System Version 4
 keyword: Internet-Draft
 
 stand_alone: yes
-pi: [toc, sortrefs, symrefs]
+pi: [toc, sortrefs, symrefs, docmapping]
 
 author:
  -
@@ -97,7 +97,9 @@ support the Server Message Block (SMB) {{SMB2}}. Instead, they layer
 Samba {{Samba}} on top of the NFSv4.2 service. The attributes of
 hidden, system, and offline have already been introduced in the
 NFSv4.2 protocol to support Samba.  The Samba implementation can
-utilze these attributes to provide SMB semantics.
+utilze these attributes to provide SMB semantics. While private
+protocols can supply these features, it is better to drive
+then into open standards.
 
 Another concept that can be adapted from SMB is that of Access Based
 Enumeration (ABE). If a share or a folder has ABE enabled, then the
@@ -155,14 +157,15 @@ by clients.
 Further, the definitions of the following terms are referenced as follows:
 
 - GETATTR ({{Section 18.7 of RFC8881}})
-- hidden ({{Section 5.8.2.15 of RFC8881}}
+- hidden ({{Section 5.8.2.15 of RFC8881}})
 - Mandatory Access Control (MAC) ({{RFC4949}})
-- mode ({{Section 6.2.4 of RFC8881}}
+- NFS4ERR_ATTRNOTSUPP ({{Section 15.1.15.1 of RFC8881}}
+- mode ({{Section 6.2.4 of RFC8881}})
 - offline ({{Section 2 of RC9754}})
-- owner ({{Section 5.8.2.26 of RFC8881}}
-- owner_group ({{Section 5.8.2.27 of RFC8881}}
+- owner ({{Section 5.8.2.26 of RFC8881}})
+- owner_group ({{Section 5.8.2.27 of RFC8881}})
 - READDIR ({{Section 18.23 of RFC8881}})
-- system ({{Section 5.8.2.36 of RFC8881}}
+- system ({{Section 5.8.2.36 of RFC8881}})
 
 ## Requirements Language
 
@@ -172,10 +175,15 @@ Further, the definitions of the following terms are referenced as follows:
 
 If a file object or directory has the uncacheable attribute set,
 then the client MUST NOT cache its dirent attributes. This means
-that even if the client has previously retrieved the attributes
-for a user, it MUST query the server again for those attributes
-on subsequent requests. Additionally, the client MUST NOT share
+that even if the client has previously retrieved the attributes for
+a user, it MUST query the server again for those attributes on
+subsequent requests. Additionally, the client MUST NOT share
 attributes between different users.
+
+A client can easily determine whether or not a server supports
+the uncacheable attribute with a simple GETATTR on any
+dirent. If the server does not support the uncacheable
+attribute, it will return an error of NFS4ERR_ATTRNOTSUPP.
 
 # Uncacheable Files {#sec_files}
 
