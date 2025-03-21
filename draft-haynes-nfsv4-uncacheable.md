@@ -62,7 +62,7 @@ Working Group information can be found at [](https://github.com/ietf-wg-nfsv4).
 
 In the Network File System version 4.2 (NFSv4.2) {{RFC7863}}, a client
 queries for either a file's or directory's attributes via either GETATTR
-{{Section 18.7 of RFC8881}} or READDIR {{Section 18.23 of RFC8881}}
+({{Section 18.7 of RFC8881}}) or READDIR ({{Section 18.23 of RFC8881}})
 to the server. These directory entries (dirents) can be cached locally
 by the client.
 
@@ -74,7 +74,7 @@ instructs the client not to cache the dirent for a file or directory
 object. Consequently, each time a client queries for these attributes,
 the server's response can be tailored to the specific user making
 the request, based on factors such as Access Control Lists (ACLs) on
-the file or directory object {{Section 6 of RFC8881}}
+the file or directory object ({{Section 6 of RFC8881}})
 or proprietary policies.
 
 In addition to caching metadata, clients can also cache file data. The
