@@ -23,6 +23,8 @@ author:
 normative:
   RFC2119:
   RFC4506:
+  RFC4949:
+  RFC7204:
   RFC7862:
   RFC7863:
   RFC8174:
@@ -168,10 +170,15 @@ should be placed in their appropriate sections within the existing XDR.
 
 # Security Considerations
 
-Clients MUST NOT make access decisions for uncacheable dirents. These
-decisions MUST be made by the server. The uncacheable attribute allows
-dirents to be annotated such that attributes are presented to the user
-based on the server's access control decisions.
+For a given user A, a client MUST NOT make access decisions for
+uncacheable dirents retrieved for another user B. These decisions
+MUST be made by the server.  If the client is Labeled NFS aware
+({{RFC7204}}), then the client will locally enforce the Mandatory
+Access Control (MAC) (as defined in {{RFC4949}}).
+
+The uncacheable attribute allows dirents to be annotated such that
+attributes are presented to the user based on the server's access
+control decisions.
 
 # IANA Considerations
 
