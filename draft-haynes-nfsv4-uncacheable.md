@@ -45,7 +45,7 @@ informative:
   RFC1813:
   Samba:
     target: https://www.samba.org/
-    title: Samba.org. Samba Project Website. 
+    title: Samba.org. Samba Project Website.
   SMB2:
     title:  Server Message Block (SMB) Protocol Versions 2 and 3
     author:
@@ -114,7 +114,7 @@ with the uncacheable attribute.
 While some argument could be made to introduce two new attributes,
 the functionality of the uncacheable attribute dictates which cache
 is to be bypassed. As ABE is concerned with walking the namespace,
-it is only applicable to be acted on dirents which are of type attribute value of 
+it is only applicable to be acted on dirents which are of type attribute value of
 NF4DIR. And as bypassing file caching is file based, it is only
 applicable for dirents which are of type attribute value of  NF4REG.[^1]
 
