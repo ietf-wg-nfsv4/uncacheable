@@ -4,8 +4,8 @@
 
 Network File System Version 4                                  T. Haynes
 Internet-Draft                                               Hammerspace
-Intended status: Standards Track                           18 March 2025
-Expires: 19 September 2025
+Intended status: Standards Track                           23 March 2025
+Expires: 24 September 2025
 
 
                Adding an Uncacheable Attribute to NFSv4.2
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 September 2025.
+   This Internet-Draft will expire on 24 September 2025.
 
 Copyright Notice
 
@@ -72,41 +72,60 @@ Table of Contents
    1.  Introduction
      1.1.  Definitions
      1.2.  Requirements Language
-   2.  Uncacheable Dirents
-   3.  Uncacheable Files
+   2.  Caching of Dirents
+     2.1.  Uncacheable Dirents
+   3.  Caching of File Data
+     3.1.  Uncacheable Files
    4.  XDR for Offline Attribute
    5.  Extraction of XDR
    6.  Security Considerations
    7.  IANA Considerations
-   8.  Normative References
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
    Acknowledgments
    Author's Address
 
 1.  Introduction
 
-   In the Network File System version 4.2 (NFSv4.2) [RFC7863], a client
-   queries for either a file's or directory's attributes via either
-   GETATTR Section 18.7 of [RFC8881] or READDIR Section 18.23 of
-   [RFC8881] to the server.  These directory entries (dirents) can be
-   cached locally by the client.
+   With a remote filesystem, the client typically caches both directory
+   entries (dirents) and file contents in order to improve performance.
+   Several assumptions are made about the rate of change in the dirents
+   and the number of clients trying to concurrently access a file.  With
+   NFSv4.2, this could theoretically be mitigated by directory
+   delegations for the dirents and practically by file delegations for
+   the file contents.
 
-   Since cached dirents are shared by all users on a client, and the
-   client cannot determine access permissions for individual dirents,
-   all users are presented with the same set of attributes.  To address
-   this, this document introduces the new uncacheable attribute.  This
-   attribute instructs the client not to cache the dirent for a file or
-   directory object.  Consequently, each time a client queries for these
-   attributes, the server's response can be tailored to the specific
-   user making the request, based on factors such as Access Control
-   Lists (ACLs) on the file or directory object Section 6 of [RFC8881]
-   or proprietary policies.
+   There are prior efforts to bypass both the dirent and file caching.
+   Access Based Enumeration (ABE) is used in Server Message Block (SMB)
+   [SMB2] protocol to effectively limit the namespace visibility per
+   user.  In Highly Parallel Computing (HPC) workloads, file caching is
+   bypassed in order to achieve consistent work flows.
 
-   In addition to caching metadata, clients can also cache file data.
-   The uncacheable attribute also instructs the client to bypass its
-   page cache for the file.  This behavior is similar to using the
-   O_DIRECT flag with the open call.  This can be beneficial for files
-   that are not shared or for files that do not exhibit access patterns
-   suitable for caching.
+   This document introduces the uncacheable attribute to NFSv4.2 to
+   implement ABE and to bypass file caching on the client.  As such, it
+   is an OPTIONAL to implement attribute for NFSv4.2.  However, if both
+   the client and the server support this attribute, then the client
+   MUST follow the semantics of uncacheable.
+   // What about mixed modes?
+
+   A client can easily determine whether or not a server supports the
+   uncacheable attribute with a simple GETATTR on any dirent.  If the
+   server does not support the uncacheable attribute, it will return an
+   error of NFS4ERR_ATTRNOTSUPP.
+
+   The only way that the server can determine that the client supports
+   the attribute is if the client sends either a GETATTR or a SETATTR
+   with the uncacheable attribute.
+
+   While some argument could be made to introduce two new attributes,
+   the functionality of the uncacheable attribute dictates which cache
+   is to be bypassed.  As ABE is concerned with walking the namespace,
+   it is only applicable to be acted on dirents which are of type
+   attribute value of NF4DIR.  And as bypassing file caching is file
+   based, it is only applicable for dirents which are of type attribute
+   value of NF4REG.
+   // What about the other file types?
 
    Using the process detailed in [RFC8178], the revisions in this
    document become an extension of NFSv4.2 [RFC7862].  They are built on
@@ -115,7 +134,7 @@ Table of Contents
 
 1.1.  Definitions
 
-   Access Based Enumeration  When servicing a READDIR or GETATTR
+   Access Based Enumeration (ABE)  When servicing a READDIR or GETATTR
       operation, the server provides results based on the access
       permissions of the user making the request.
 
@@ -123,15 +142,102 @@ Table of Contents
       subdirectory.  In the context of NFSv4, a dirent marked as
       uncacheable MUST NOT be cached by clients.
 
+   dirent caching  A client cache that is used to avoid looking up
+      attributes.
+
+   file caching  A client cache, normally called the page cache, which
+      caches the contents of a regular file.  Typical usage would be to
+      accumulate changes to be bunched together for writing to the
+      server.
+
+   Further, the definitions of the following terms are referenced as
+   follows:
+
+   *  directory delegations (Section 10.9 of [RFC8881])
+
+   *  file delegations (Section 10.2 of [RFC8881])
+
+   *  GETATTR (Section 18.7 of [RFC8881])
+
+   *  hidden (Section 5.8.2.15 of [RFC8881])
+
+   *  Mandatory Access Control (MAC) ([RFC4949])
+
+   *  NF4DIR (Section 5.8.1.2 of [RFC8881])
+
+   *  NF4REG (Section 5.8.1.2 of [RFC8881])
+
+   *  NFS4ERR_ATTRNOTSUPP (Section 15.1.15.1 of [RFC8881]
+
+   *  mode (Section 6.2.4 of [RFC8881])
+
+   *  offline (Section 2 of [I-D.ietf-nfsv4-delstid])
+
+   *  owner (Section 5.8.2.26 of [RFC8881])
+
+   *  owner_group (Section 5.8.2.27 of [RFC8881])
+
+   *  READDIR (Section 18.23 of [RFC8881])
+
+   *  SETATTR (Section 18.30 of [RFC8881])
+
+   *  system (Section 5.8.2.36 of [RFC8881])
+
+   *  type (Section 5.8.1.2 of [RFC8881])
+
 1.2.  Requirements Language
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-2.  Uncacheable Dirents
+2.  Caching of Dirents
+
+   With a remote filesystem, the client typically caches directory
+   entries (dirents) locally to improve performance.  This cooperation
+   succeeds because both the server and client operate under POSIX
+   semantics ([POSIX.1]) and agree to interpretation of mode bits with
+   respect to the uid and gid in NFSv3 [RFC1813].  For NFSv4.2, these
+   would respectively be the mode, owner, and owner_group attributes
+   defined in Section 5 of [RFC8881].  Note that this cooperation does
+   not apply to Access Control List (ACLs) entries as NFSv4.2 does not
+   implement a strict POSIX style ACL.
+
+   NFSv4.2 does implement NFSv4.1 ACLs, which are enforced on the server
+   and not the client.  As such, ACL enforcement requires the client to
+   bypass the dirent cache to have checks done when a new user attempts
+   to access the dirent.
+
+   Another consideration is that not all server implementations natively
+   support the SMB [SMB2].  Instead, they layer Samba [Samba] on top of
+   the NFSv4.2 service.  The attributes of hidden, system, and offline
+   have already been introduced in the NFSv4.2 protocol to support
+   Samba.  The Samba implementation can utilize these attributes to
+   provide SMB semantics.  While private protocols can supply these
+   features, it is better to drive them into open standards.
+
+   Another concept that can be adapted from SMB is that of Access Based
+   Enumeration (ABE).  If a share or a folder has ABE enabled, then the
+   user can only see the files and sub-folders for which they have
+   permissions.
+
+   Under the POSIX model, this can be done on the client and not the
+   server.  However, that only works with uid, gid, and mode bits.  If
+   we consider identity mappings, ACLS, and server local policies, then
+   the determination of ABE MUST be done on the server.
+
+   Since cached dirents are shared by all users on a client, and the
+   client cannot determine access permissions for individual dirents,
+   all users are presented with the same set of attributes.  To address
+   this, this document introduces the new uncacheable attribute.  This
+   attribute instructs the client not to cache the dirent for a file or
+   directory object.  Consequently, each time a client queries for these
+   attributes, the server's response can be tailored to the specific
+   user making the request.
+
+2.1.  Uncacheable Dirents
 
    If a file object or directory has the uncacheable attribute set, then
    the client MUST NOT cache its dirent attributes.  This means that
@@ -140,7 +246,21 @@ Table of Contents
    subsequent requests.  Additionally, the client MUST NOT share
    attributes between different users.
 
-3.  Uncacheable Files
+3.  Caching of File Data
+
+   In addition to caching metadata, clients can also cache file data.
+   The uncacheable attribute also instructs the client to bypass its
+   page cache for the file.  This behavior is similar to using the
+   O_DIRECT flag with the open call ([open]).  This can be beneficial
+   for files that are not shared or for files that do not exhibit access
+   patterns suitable for caching.
+
+   However, the real need for bypassing write caching is evident in HPC
+   workloads.  In general, these involve massive data transfers and
+   require extremely low latency.  Write caching can introduce
+   unpredictable latency, as data is buffered and flushed later.
+
+3.1.  Uncacheable Files
 
    If a file object is marked as uncacheable, all modifications to the
    file MUST be immediately sent from the client to the server.  In
@@ -185,16 +305,30 @@ Table of Contents
 
 6.  Security Considerations
 
-   Clients MUST NOT make access decisions for uncacheable dirents.
-   These decisions MUST be made by the server.  The uncacheable
-   attribute allows dirents to be annotated such that attributes are
-   presented to the user based on the server's access control decisions.
+   For a given user A, a client MUST NOT make access decisions for
+   uncacheable dirents retrieved for another user B.  These decisions
+   MUST be made by the server.  If the client is Labeled NFS aware
+   ([RFC7204]), then the client MUST locally enforce the MAC security
+   policies.
+
+   The uncacheable attribute allows dirents to be annotated such that
+   attributes are presented to the user based on the server's access
+   control decisions.
 
 7.  IANA Considerations
 
    This document has no IANA actions.
 
-8.  Normative References
+8.  References
+
+8.1.  Normative References
+
+   [I-D.ietf-nfsv4-delstid]
+              Haynes, T. and T. Myklebust, "Extending the Opening of
+              Files in NFSv4.2", Work in Progress, Internet-Draft,
+              draft-ietf-nfsv4-delstid-08, 2 October 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-nfsv4-
+              delstid-08>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -204,6 +338,14 @@ Table of Contents
    [RFC4506]  Eisler, M., Ed., "XDR: External Data Representation
               Standard", STD 67, RFC 4506, DOI 10.17487/RFC4506, May
               2006, <https://www.rfc-editor.org/rfc/rfc4506>.
+
+   [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2",
+              FYI 36, RFC 4949, DOI 10.17487/RFC4949, August 2007,
+              <https://www.rfc-editor.org/rfc/rfc4949>.
+
+   [RFC7204]  Haynes, T., "Requirements for Labeled NFS", RFC 7204,
+              DOI 10.17487/RFC7204, April 2014,
+              <https://www.rfc-editor.org/rfc/rfc7204>.
 
    [RFC7862]  Haynes, T., "Network File System (NFS) Version 4 Minor
               Version 2 Protocol", RFC 7862, DOI 10.17487/RFC7862,
@@ -226,6 +368,25 @@ Table of Contents
               Version 4 Minor Version 1 Protocol", RFC 8881,
               DOI 10.17487/RFC8881, August 2020,
               <https://www.rfc-editor.org/rfc/rfc8881>.
+
+8.2.  Informative References
+
+   [open]     "open and create files.", Linux Programmer's Manual ,
+              n.d..
+
+   [POSIX.1]  IEEE, "The Open Group Base Specifications Issue 7", IEEE
+              Std 1003.1, 2013 Edition , 2013.
+
+   [RFC1813]  Callaghan, B., Pawlowski, B., and P. Staubach, "NFS
+              Version 3 Protocol Specification", RFC 1813,
+              DOI 10.17487/RFC1813, June 1995,
+              <https://www.rfc-editor.org/rfc/rfc1813>.
+
+   [Samba]    "Samba.org. Samba Project Website.", n.d.,
+              <https://www.samba.org/>.
+
+   [SMB2]     Microsoft Learn, "Server Message Block (SMB) Protocol
+              Versions 2 and 3", n.d..
 
 Acknowledgments
 

@@ -10,11 +10,11 @@ View [saved issues](issues.html), or the latest GitHub [issues](https://github.c
 
 | Draft |     |     |     |
 | ----- | --- | --- | --- |
-| [Uncacheable Attribute](draft-haynes-nfsv4-uncacheable-01/draft-haynes-nfsv4-uncacheable.html "Adding an Uncacheable Attribute to NFSv4.2 (HTML)") | [plain text](draft-haynes-nfsv4-uncacheable-01/draft-haynes-nfsv4-uncacheable.txt "Adding an Uncacheable Attribute to NFSv4.2 (Text)") | same as main |
+| [Uncacheable Attribute](draft-haynes-nfsv4-uncacheable-01/draft-haynes-nfsv4-uncacheable.html "Adding an Uncacheable Attribute to NFSv4.2 (HTML)") | [plain text](draft-haynes-nfsv4-uncacheable-01/draft-haynes-nfsv4-uncacheable.txt "Adding an Uncacheable Attribute to NFSv4.2 (Text)") | [diff with main](https://author-tools.ietf.org/api/iddiff?url_1=https://ietf-wg-nfsv4.github.io/uncacheable/draft-haynes-nfsv4-uncacheable.txt&url_2=https://ietf-wg-nfsv4.github.io/uncacheable/draft-haynes-nfsv4-uncacheable-01/draft-haynes-nfsv4-uncacheable.txt) |
 
 ## Preview for branch [draft-haynes-nfsv4-uncacheable-02](draft-haynes-nfsv4-uncacheable-02)
 
 | Draft |     |     |     |
 | ----- | --- | --- | --- |
-| [Uncacheable Attribute](draft-haynes-nfsv4-uncacheable-02/draft-haynes-nfsv4-uncacheable.html "Adding an Uncacheable Attribute to NFSv4.2 (HTML)") | [plain text](draft-haynes-nfsv4-uncacheable-02/draft-haynes-nfsv4-uncacheable.txt "Adding an Uncacheable Attribute to NFSv4.2 (Text)") | same as main |
+| [Uncacheable Attribute](draft-haynes-nfsv4-uncacheable-02/draft-haynes-nfsv4-uncacheable.html "Adding an Uncacheable Attribute to NFSv4.2 (HTML)") | [plain text](draft-haynes-nfsv4-uncacheable-02/draft-haynes-nfsv4-uncacheable.txt "Adding an Uncacheable Attribute to NFSv4.2 (Text)") | [diff with main](https://author-tools.ietf.org/api/iddiff?url_1=https://ietf-wg-nfsv4.github.io/uncacheable/draft-haynes-nfsv4-uncacheable.txt&url_2=https://ietf-wg-nfsv4.github.io/uncacheable/draft-haynes-nfsv4-uncacheable-02/draft-haynes-nfsv4-uncacheable.txt) |
 
