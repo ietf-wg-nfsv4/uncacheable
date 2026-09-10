@@ -118,8 +118,10 @@ in accordance with the semantics defined in this document.  The
 attribute itself is specified in {{sec_attribute}} and the client
 behavior it advises in {{sec_caching}}.
 
-Using the process described in {{RFC8178}}, the revisions in this
-document extend NFSv4.2 {{RFC7862}}.  They are built on top of the
+Using the process described in {{RFC8178}} Section 6, this document
+extends NFSv4.2 {{RFC7862}}; as that section provides, it does not
+update {{RFC7862}}, which remains a valid description of the base
+variant of the minor version.  The revisions are built on top of the
 external data representation (XDR) {{RFC4506}} generated from
 {{RFC7863}}.
 
