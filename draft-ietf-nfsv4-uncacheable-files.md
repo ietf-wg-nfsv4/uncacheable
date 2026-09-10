@@ -182,9 +182,13 @@ supported for a given file by examining the supported_attrs attribute
 for that file's filesystem or by probing support using the procedures
 described in {{RFC8178}}.
 
-The uncacheable file data attribute applies only to regular files
-(NF4REG).  A server that receives a GETATTR requesting this attribute
-for an object that is not a regular file MUST return FALSE: support
+The uncacheable file data attribute applies only to regular files,
+that is, objects of type NF4REG or NF4NAMEDATTR ({{RFC7862}} Section
+6.1).  A named attribute is read and written with the same READ and
+WRITE operations as a regular file ({{RFC8881}} Section 5.3), so a
+client caches its data by the same mechanism and is exposed to the
+same hazards.  A server that receives a GETATTR requesting this
+attribute for an object that is not a regular file MUST return FALSE: support
 for an attribute is advertised per file system ({{RFC8881}} Section
 5.8.1.1), so a server that supports this attribute supports it for
 every object in that file system and owes a value for each
