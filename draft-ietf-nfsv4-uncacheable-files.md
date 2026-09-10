@@ -162,8 +162,18 @@ error codes, object types, and attributes as defined in {{RFC8881}}.
 # The Uncacheable File Data Attribute {#sec_attribute}
 
 The uncacheable file data attribute, fattr4_uncacheable_file_data
-(see {{sec_xdr}}), is an OPTIONAL attribute.  It is read-write,
-applies on a per-file basis, and has a data type of boolean.
+(see {{sec_xdr}}), is a RECOMMENDED attribute for NFSv4.2, in the
+attribute-category sense of {{RFC8881}} Section 5.2 and {{RFC7862}}
+Section 12 rather than the BCP 14 sense; a server is not required to
+support it.  It is read-write, applies on a per-file basis, and has a
+data type of boolean.  {{tab_attr}} summarizes the attribute using
+the columns of {{RFC7862}} Section 12.1, where "R W" indicates that
+GETATTR may retrieve the attribute and SETATTR may set it.
+
+| Name                  | Id | Data Type | Acc |
+|-----------------------|----|-----------|-----|
+| uncacheable_file_data | 87 | bool      | R W |
+{: #tab_attr title="New RECOMMENDED Attribute"}
 
 Support for the uncacheable file data attribute is specific to the
 exported filesystem and may differ between filesystems served by the
