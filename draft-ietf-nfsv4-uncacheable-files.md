@@ -152,6 +152,16 @@ write hole
   This can result in stale data overwriting newer updates, particularly
   in environments that use erasure encoding or striped storage.
 
+revalidation
+
+: The procedure of {{RFC8881}} Section 10.3.1 by which a client
+  determines whether data or attributes it holds in a cache are still
+  current: the client fetches the change attribute from the server,
+  compares it with the value it cached, and, if they differ, treats
+  the cached data and attributes as invalid.  A client validates data
+  when it fetches it from the server; it revalidates before reusing
+  what it cached.
+
 This document assumes familiarity with the NFSv4 protocol operations,
 error codes, object types, and attributes as defined in {{RFC8881}}.
 
@@ -266,7 +276,7 @@ concurrently modify disjoint byte ranges of the same file can result
 in read-modify-write operations based on stale data.
 
 Clients SHOULD ensure that cached file data is not reused without
-first validating that the file has not changed.
+first revalidating it.
 
 At a minimum, clients MUST revalidate metadata necessary to ensure
 correctness of cached file data, including the change attribute and
