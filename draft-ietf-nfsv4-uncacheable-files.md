@@ -110,33 +110,13 @@ standardized mechanism for communicating this intent between servers
 and clients.
 
 This document introduces the uncacheable file data attribute to
-NFSv4.2.  This OPTIONAL attribute allows a server to indicate that
-client-side caching of file data for a particular file is unsuitable.
-When both the client and the server support this attribute, the
-client is advised to suppress client-side caching of file data for
-that file, in accordance with the semantics defined in this document.
-
-The uncacheable file data attribute is read-write, applies on a
-per-file basis, and has a data type of boolean.
-
-Support for the uncacheable file data attribute is specific to the
-exported filesystem and may differ between filesystems served by the
-same server.  A client can determine whether the attribute is
-supported for a given file by examining the supported_attrs attribute
-for that file's filesystem or by probing support using the procedures
-described in {{RFC8178}}.
-
-The uncacheable file data attribute applies only to regular files
-(NF4REG).  A server that receives a GETATTR requesting this attribute
-for an object that is not a regular file MUST return FALSE: support
-for an attribute is advertised per file system ({{RFC8881}} Section
-5.8.1.1), so a server that supports this attribute supports it for
-every object in that file system and owes a value for each
-({{RFC8881}} Section 18.7.3).  As with rawdev ({{RFC8881}} Section
-5.8.2.31), the value SHOULD NOT be considered useful for such an
-object.  A server that receives a SETATTR requesting this attribute on
-an object that is not a regular file MUST return NFS4ERR_WRONG_TYPE
-({{RFC8881}} Section 15.1.2.9).
+NFSv4.2.  This attribute allows a server to indicate that client-side
+caching of file data for a particular file is unsuitable.  When both
+the client and the server support this attribute, the client is
+advised to suppress client-side caching of file data for that file,
+in accordance with the semantics defined in this document.  The
+attribute itself is specified in {{sec_attribute}} and the client
+behavior it advises in {{sec_caching}}.
 
 Using the process described in {{RFC8178}}, the revisions in this
 document extend NFSv4.2 {{RFC7862}}.  They are built on top of the
@@ -179,8 +159,32 @@ error codes, object types, and attributes as defined in {{RFC8881}}.
 
 {::boilerplate bcp14-tagged}
 
+# The Uncacheable File Data Attribute {#sec_attribute}
 
-# Client-Side Caching of File Data
+The uncacheable file data attribute, fattr4_uncacheable_file_data
+(see {{sec_xdr}}), is an OPTIONAL attribute.  It is read-write,
+applies on a per-file basis, and has a data type of boolean.
+
+Support for the uncacheable file data attribute is specific to the
+exported filesystem and may differ between filesystems served by the
+same server.  A client can determine whether the attribute is
+supported for a given file by examining the supported_attrs attribute
+for that file's filesystem or by probing support using the procedures
+described in {{RFC8178}}.
+
+The uncacheable file data attribute applies only to regular files
+(NF4REG).  A server that receives a GETATTR requesting this attribute
+for an object that is not a regular file MUST return FALSE: support
+for an attribute is advertised per file system ({{RFC8881}} Section
+5.8.1.1), so a server that supports this attribute supports it for
+every object in that file system and owes a value for each
+({{RFC8881}} Section 18.7.3).  As with rawdev ({{RFC8881}} Section
+5.8.2.31), the value SHOULD NOT be considered useful for such an
+object.  A server that receives a SETATTR requesting this attribute on
+an object that is not a regular file MUST return NFS4ERR_WRONG_TYPE
+({{RFC8881}} Section 15.1.2.9).
+
+# Client-Side Caching of File Data {#sec_caching}
 
 The uncacheable file data attribute advises the client to limit the
 use of client-side caching of file data for a file. This includes
@@ -342,7 +346,7 @@ issue well-formed I/O requests, this approach has been observed to
 improve performance in many cases, while also reducing memory
 pressure and CPU utilization in the NFS client.
 
-# XDR for Uncacheable Attribute
+# XDR for Uncacheable Attribute {#sec_xdr}
 
 ~~~ xdr
 ///
