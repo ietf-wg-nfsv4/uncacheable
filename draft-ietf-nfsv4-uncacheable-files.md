@@ -324,6 +324,12 @@ control mechanisms.
 Requests that are not permitted MUST be rejected using existing
 NFSv4 error codes (e.g., NFS4ERR_INVAL or NFS4ERR_PERM).
 
+This document does not require a server to implement any particular
+policy, nor any particular means of configuring one.  A server that
+always permits, or always refuses, requests to set or clear the
+attribute conforms to this document; what the protocol requires is
+only the error returned when a request is refused.
+
 One possible deployment model is for a server or administrator to
 configure a mount (see {{MOUNT}}) option such that newly created
 files under a given export are marked as uncacheable file data. In
